@@ -89,7 +89,10 @@ waits for before it signs the message:
 - **1000**: Fast Transfer (confirmed, not yet finalized)
 - **2000**: Standard Transfer (finalized)
 
-A value above 2000 is capped to 2000.
+Only these two thresholds exist. Per Circle's
+[technical guide](https://developers.circle.com/cctp/technical-guide), any value
+below 1000 is treated as 1000 and any value above 1000 is treated as 2000. A
+value like 1500 does not stay at 1500, it rounds up to a finalized transfer.
 
 For burns sourced **from Arc Testnet**, use **2000**. A burn submitted with 1000
 can leave the attestation stuck in `pending` in the Iris API rather than

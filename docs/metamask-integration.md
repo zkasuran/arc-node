@@ -77,6 +77,8 @@ async function waitForProviderChain(
 ): Promise<void> {
   for (let i = 0; i < retries; i++) {
     if (i > 0) await new Promise((r) => setTimeout(r, 500 * i));
+    // Must be a new instance each iteration: ethers caches the network per
+    // BrowserProvider, so a reused one keeps returning the stale chain.
     const provider = new ethers.BrowserProvider(window.ethereum);
     const network = await provider.getNetwork();
     if (Number(network.chainId) === expectedChainId) return;
@@ -92,7 +94,7 @@ await waitForProviderChain(5042002);
 // Now safe to send transactions
 ```
 
-Construct a fresh `BrowserProvider` on each attempt. ethers caches the network per provider instance, so reusing one instance can keep returning the stale chain.
+Construct a fresh `BrowserProvider` on each attempt, as the comment in the loop says. ethers v6 caches the network from the first `getNetwork()` call on an instance, so a reused provider keeps returning the stale chain and the loop burns every retry and throws even after the transport has switched. A `getProvider()` helper that always returns `new ethers.BrowserProvider(window.ethereum)`, never a cached singleton, gives the same guarantee.
 
 The wait is only needed when a transaction follows the network switch in the same flow. Reading balances or registering tokens is not affected.
 

@@ -383,7 +383,10 @@ mod tests {
 
             let serialised = serde_json::to_string(&config).unwrap();
             assert!(!serialised.contains("s3cret"), "serialised: {serialised}");
-            assert!(!serialised.contains("admin_token"), "serialised: {serialised}");
+            assert!(
+                !serialised.contains("admin_token"),
+                "serialised: {serialised}"
+            );
 
             let round_tripped: RpcConfig = serde_json::from_str(&serialised).unwrap();
             assert_eq!(round_tripped.admin_token, None);

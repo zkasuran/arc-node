@@ -188,9 +188,12 @@ pub fn build_router(
 
         // route_layer only runs for requests that match one of these routes, so
         // unmatched paths still fall through to the public router.
-        router = router.merge(admin_router.route_layer(
-            axum::middleware::from_fn_with_state(token, require_admin_token),
-        ));
+        router = router.merge(
+            admin_router.route_layer(axum::middleware::from_fn_with_state(
+                token,
+                require_admin_token,
+            )),
+        );
     } else {
         info!("RPC admin routes disabled: no --rpc.admin-token-file configured");
     }
